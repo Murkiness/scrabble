@@ -75,32 +75,57 @@ class GameScene: SKScene {
     //MARK: Handle Finding Words
     func findAdjacentLetter(letter: Letter) {
         let currentPosition = letter.gridPosition
+        var horizontalArray = [Letter]()
+        var verticalArray = [Letter]()
         
-        let horizontalString = go(way: Ways.Left, currentPoint: currentPosition).reversed() + letter.getActualLetter() +
-            go(way: Ways.Right, currentPoint: currentPosition)
+        var tempArray = [Letter]()
         
-        let verticalString = go(way: Ways.Top, currentPoint: currentPosition).reversed() + letter.getActualLetter() +
-            go(way: Ways.Bottom, currentPoint: currentPosition)
+        horizontalArray.append(contentsOf: go(way: Ways.Left, currentPoint: currentPosition, &tempArray))
+        horizontalArray.reverse()
+        horizontalArray.append(letter)
+        tempArray.removeAll()
+        horizontalArray.append(contentsOf: go(way: Ways.Right, currentPoint: currentPosition, &tempArray))
+        
+        tempArray.removeAll()
+        verticalArray.append(contentsOf: go(way: Ways.Top, currentPoint: currentPosition, &tempArray))
+        verticalArray.reverse()
+        verticalArray.append(letter)
+        tempArray.removeAll()
+        verticalArray.append(contentsOf: go(way: Ways.Bottom, currentPoint: currentPosition, &tempArray))
+        
+        var hstr = horizontalArray.map { $0.getActualLetter()}
+        var h = hstr.joined(separator: "")
+        
+        var vstr = verticalArray.map { $0.getActualLetter()}
+        var v = vstr.joined(separator: "")
+        
+        print("Horizontal string is \(h)")
+        print("Vertical string is \(v)")
         
         
-        print("Horizontal string is \(horizontalString)")
-        print("Vertical string is \(verticalString)")
+//        print("Horizontal string is \(horizontalString)")
+//        print("Vertical string is \(verticalString)")
         
         
     }
     
-    func go(way: CGPoint, currentPoint: CGPoint) -> String {
+    // need to write tests
+    func go(way: CGPoint, currentPoint: CGPoint, _ letterArray: inout [Letter]) -> [Letter] {
         let resultPoint = way + currentPoint
-        if Int(resultPoint.x) >= mapColumns || Int(resultPoint.y) >= mapRows {
-            return ""
+        if Int(resultPoint.x) >= mapColumns
+            || Int(resultPoint.y) >= mapRows
+            || Int(resultPoint.x) < 0
+            || Int(resultPoint.y) < 0 {
+            return letterArray
         }
         
         let letter = obstacles.filter { $0.gridPosition == resultPoint }.first
         
         if letter == nil {
-            return ""
+            return letterArray
         } else {
-            return (letter?.getActualLetter())! + go(way: way, currentPoint: resultPoint)
+            letterArray.append(letter!)
+            return go(way: way, currentPoint: resultPoint, &letterArray)
         }
         
     }
