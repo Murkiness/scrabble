@@ -102,6 +102,8 @@ class GameScene: SKScene {
         print("Horizontal string is \(h)")
         print("Vertical string is \(v)")
         
+        findWords(source: h)
+        
         
 //        print("Horizontal string is \(horizontalString)")
 //        print("Vertical string is \(verticalString)")
@@ -109,7 +111,7 @@ class GameScene: SKScene {
         
     }
     
-    // need to write tests
+    // need to come with other name
     func go(way: CGPoint, currentPoint: CGPoint, _ letterArray: inout [Letter]) -> [Letter] {
         let resultPoint = way + currentPoint
         if Int(resultPoint.x) >= mapColumns
@@ -128,6 +130,36 @@ class GameScene: SKScene {
             return go(way: way, currentPoint: resultPoint, &letterArray)
         }
         
+    }
+    
+    func findWords(source: String) -> [String] {
+        var result = [String]()
+        let file = "ospd.txt"
+        
+        if let path = Bundle.main.path(forResource: "ospd", ofType: "txt"){
+            let fm = FileManager()
+            let exists = fm.fileExists(atPath: path)
+            
+            if exists {
+                let content = fm.contents(atPath: path)
+                if let contentAsString = String(data: content!, encoding: .utf8) {
+                    let index = contentAsString.index((contentAsString.startIndex), offsetBy: 20)
+                    print("Reading from file \(contentAsString[...index])")
+                    
+                }
+                
+
+
+
+                
+            }
+            
+            
+        }
+        
+        
+        
+        return result
     }
     
     func startGame() {
