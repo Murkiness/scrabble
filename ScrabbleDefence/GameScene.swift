@@ -9,6 +9,10 @@
 import SpriteKit
 import GameplayKit
 
+enum MyError: Error {
+    case runtimeError(String)
+}
+
 enum Edge: Int {
     case Both = 2
     case One = 1
@@ -42,8 +46,11 @@ class GameScene: SKScene {
     
     var obstacles = [Letter]()
     
+    var wordDict: [String: Bool]?
+    
     
     override func didMove(to view: SKView) {
+        wordDict = createWordDict()
         
         createBackground()
         startGame()
@@ -102,7 +109,13 @@ class GameScene: SKScene {
         print("Horizontal string is \(h)")
         print("Vertical string is \(v)")
         
-        findWords(source: h)
+        if h.count >= 3 {
+            print("found words \(findWords(source: h))")
+        }
+        
+        if v.count >= 3 {
+            print("found words \(findWords(source: v))")
+        }
         
         
 //        print("Horizontal string is \(horizontalString)")
@@ -132,9 +145,55 @@ class GameScene: SKScene {
         
     }
     
+    
     func findWords(source: String) -> [String] {
         var result = [String]()
-        let file = "ospd.txt"
+        let sourceLength = source.count
+        
+        
+        for wordLength in 3...sourceLength {
+            for startPos in 0...(sourceLength - wordLength) {
+                let startIndex = source.index(source.startIndex, offsetBy: startPos)
+                let endIndex = source.index(startIndex, offsetBy: wordLength+startPos)
+                let substr = source[startIndex..<endIndex]
+                let substrToStr = String(substr).lowercased()
+                
+                if wordDict![substrToStr] != nil {
+                    result.append(substrToStr)
+                }
+                
+            }
+        }
+        
+        print(result)
+        
+        return result
+    }
+
+//    func findIndexesOfFirstEntryOfLetter(source: [String]) -> [String: Int] {
+//        var index = 0
+//        var dict = [String: Int]()
+//        for word in source {
+//            if let key = dict[String(word.first!)] {
+//
+//            } else {
+//                dict[String(word.first!)] = index
+//            }
+//            index += 1
+//        }
+//        print(dict)
+//        return dict
+//    }
+    
+//    func nextLetter(letter: String) -> String? {
+//        if letter == "Z" {
+//            return nil
+//        }
+//        alphabetArray.index(of: letter) //?
+//    }
+    
+    // I think it needs to be reworked
+    func getWordsArrayFromFile() throws -> [String] {
         
         if let path = Bundle.main.path(forResource: "ospd", ofType: "txt"){
             let fm = FileManager()
@@ -143,23 +202,24 @@ class GameScene: SKScene {
             if exists {
                 let content = fm.contents(atPath: path)
                 if let contentAsString = String(data: content!, encoding: .utf8) {
-                    let index = contentAsString.index((contentAsString.startIndex), offsetBy: 20)
-                    print("Reading from file \(contentAsString[...index])")
-                    
+                    let knownWordsArray = contentAsString.components(separatedBy: .newlines)
+                    let filteredWords = knownWordsArray.filter { $0.count > 0}
+                    return filteredWords
                 }
-                
-
-
-
-                
             }
-            
-            
+        }
+        throw MyError.runtimeError("did not get word dictionary")
+    }
+    
+    func createWordDict() -> [String: Bool] {
+        let source = try! getWordsArrayFromFile()
+        
+        var wordDict = [String: Bool]()
+        for word in source {
+            wordDict[word] = true
         }
         
-        
-        
-        return result
+        return wordDict
     }
     
     func startGame() {
@@ -223,12 +283,6 @@ class GameScene: SKScene {
             letterNode.didMoveToScene()
             obstacles.append(letterNode)
         }
-        //Everytime letter node created, it is counted as obstacle for pathfinding
-//        for place in places {
-//            //obstacles.append(CGPoint(x: place.0, y: place.1))
-//
-//        }
-        
 
     }
     
@@ -342,7 +396,6 @@ extension GameScene {
         
         return false
     }
-    
     
     func getCoordinates(at position: CGPoint) -> (Int32, Int32) {
         let row = scrabbleBackgroundMap!.tileRowIndex(fromPosition: position)

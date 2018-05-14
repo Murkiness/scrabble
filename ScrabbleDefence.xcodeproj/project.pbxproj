@@ -28,8 +28,8 @@
 		D632E706209A494B00580544 /* SKTAudio.swift in Sources */ = {isa = PBXBuildFile; fileRef = D632E6FA209A494B00580544 /* SKTAudio.swift */; };
 		D632E707209A494B00580544 /* Vector3.swift in Sources */ = {isa = PBXBuildFile; fileRef = D632E6FB209A494B00580544 /* Vector3.swift */; };
 		D632E708209A494B00580544 /* CGFloat+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D632E6FC209A494B00580544 /* CGFloat+Extensions.swift */; };
-		D673F6FD20A7770C0063B103 /* ospd.txt in Resources */ = {isa = PBXBuildFile; fileRef = D673F6FC20A7770C0063B103 /* ospd.txt */; };
 		D6A3181520A877DF00358AC8 /* FindAdjacentLetterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6A3180520A8774500358AC8 /* FindAdjacentLetterTests.swift */; };
+		D6A3181720A8AF0A00358AC8 /* ospd.txt in Resources */ = {isa = PBXBuildFile; fileRef = D6A3181620A8AF0A00358AC8 /* ospd.txt */; };
 		D6D830CC209F839F009725CC /* Letter.swift in Sources */ = {isa = PBXBuildFile; fileRef = D6D830CB209F839F009725CC /* Letter.swift */; };
 /* End PBXBuildFile section */
 
@@ -67,10 +67,10 @@
 		D632E6FA209A494B00580544 /* SKTAudio.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SKTAudio.swift; sourceTree = "<group>"; };
 		D632E6FB209A494B00580544 /* Vector3.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Vector3.swift; sourceTree = "<group>"; };
 		D632E6FC209A494B00580544 /* CGFloat+Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CGFloat+Extensions.swift"; sourceTree = "<group>"; };
-		D673F6FC20A7770C0063B103 /* ospd.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ospd.txt; sourceTree = "<group>"; };
 		D6A3180520A8774500358AC8 /* FindAdjacentLetterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FindAdjacentLetterTests.swift; sourceTree = "<group>"; };
 		D6A3180B20A877CE00358AC8 /* ScrabbleDefenceTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ScrabbleDefenceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		D6A3180F20A877CE00358AC8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D6A3181620A8AF0A00358AC8 /* ospd.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ospd.txt; sourceTree = "<group>"; };
 		D6D830CB209F839F009725CC /* Letter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Letter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -95,7 +95,7 @@
 		D632E6C8209A3C9100580544 = {
 			isa = PBXGroup;
 			children = (
-				D673F6FC20A7770C0063B103 /* ospd.txt */,
+				D6A3181620A8AF0A00358AC8 /* ospd.txt */,
 				D632E6F0209A494B00580544 /* SKTUtils */,
 				D632E6D3209A3C9100580544 /* ScrabbleDefence */,
 				D6A3180C20A877CE00358AC8 /* ScrabbleDefenceTests */,
@@ -255,7 +255,7 @@
 				D632E6E2209A3C9100580544 /* Assets.xcassets in Resources */,
 				D632E6E5209A3C9100580544 /* LaunchScreen.storyboard in Resources */,
 				D632E6D9209A3C9100580544 /* Actions.sks in Resources */,
-				D673F6FD20A7770C0063B103 /* ospd.txt in Resources */,
+				D6A3181720A8AF0A00358AC8 /* ospd.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
