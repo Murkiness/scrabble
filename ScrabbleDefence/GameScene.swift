@@ -38,6 +38,7 @@ class GameScene: SKScene {
     let mapColumns = 10
     let mapRows = 10
     let numOfStartLetters = 9
+    let numOfLettersForTurn = 3
     let alphabetArray = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".map({ String($0) })
     
     var gameIsBusy = false
@@ -71,7 +72,7 @@ class GameScene: SKScene {
         if touchedNode.name == "Background" && activeNode != nil {
             gameIsBusy = true
             if let currentLetter = moveActiveLetter(posInScene) {
-                findAdjacentLetter(letter: currentLetter)
+                processTurn(letter: currentLetter)
             } else {
                 gameIsBusy = false
             }
@@ -79,8 +80,65 @@ class GameScene: SKScene {
         
     }
     
+    func getStringFromLetterArray(array: [Letter]) -> String {
+        let letterArray = array.map { $0.getActualLetter()}
+        return letterArray.joined(separator: "")
+    }
+    
+    func getWordsFromString(source: String) -> [String] {
+        
+        if source.count >= 3 {
+            return findWords(source: source)
+        } else {
+            return [String]()
+        }
+    }
+    
+    func processTurn(letter: Letter) {
+        let temp = findAdjacentLetter(letter: letter)
+        let horizontal = temp.horizontal
+        let vertical = temp.vertical
+        
+        let h = getStringFromLetterArray(array: horizontal)
+        let v = getStringFromLetterArray(array: vertical)
+        
+        let hWords = findWords(source: h)
+        let vWords = findWords(source: v)
+        
+        if hWords.count == 0 && vWords.count == 0 {
+            
+        } else {
+            let hLongestWord = hWords.max() ?? ""
+            let vLongestWord = vWords.max() ?? ""
+            
+            if hLongestWord.count > vLongestWord.count {
+                removeLettersFromMap(letterArray: horizontal, word: hLongestWord)
+            } else {
+                removeLettersFromMap(letterArray: vertical, word: vLongestWord)
+            }
+            
+            //remove letters
+        }
+
+        
+        createLettersOnMap(numberToGenerate: numOfLettersForTurn)
+        
+    }
+    
+    func removeLettersFromMap(letterArray: [Letter], word: String) {
+        let string = getStringFromLetterArray(array: letterArray).lowercased()
+        let range = string.range(of: word)
+        let indexInArray = Int(string.distance(from: string.startIndex, to: range!.lowerBound))
+        
+        let numToDelete = word.count
+        let subLetterArray = letterArray[indexInArray..<(indexInArray+numToDelete)]
+        for node in subLetterArray {
+            node.removeFromParent()
+        }
+    }
+    
     //MARK: Handle Finding Words
-    func findAdjacentLetter(letter: Letter) {
+    func findAdjacentLetter(letter: Letter) -> (horizontal: [Letter], vertical: [Letter]) {
         let currentPosition = letter.gridPosition
         var horizontalArray = [Letter]()
         var verticalArray = [Letter]()
@@ -99,29 +157,8 @@ class GameScene: SKScene {
         verticalArray.append(letter)
         tempArray.removeAll()
         verticalArray.append(contentsOf: go(way: Ways.Bottom, currentPoint: currentPosition, &tempArray))
-        
-        var hstr = horizontalArray.map { $0.getActualLetter()}
-        var h = hstr.joined(separator: "")
-        
-        var vstr = verticalArray.map { $0.getActualLetter()}
-        var v = vstr.joined(separator: "")
-        
-        print("Horizontal string is \(h)")
-        print("Vertical string is \(v)")
-        
-        if h.count >= 3 {
-            print("found words \(findWords(source: h))")
-        }
-        
-        if v.count >= 3 {
-            print("found words \(findWords(source: v))")
-        }
-        
-        
-//        print("Horizontal string is \(horizontalString)")
-//        print("Vertical string is \(verticalString)")
-        
-        
+    
+        return (horizontalArray, verticalArray)
     }
     
     // need to come with other name
@@ -147,6 +184,9 @@ class GameScene: SKScene {
     
     
     func findWords(source: String) -> [String] {
+        if source.count < 3 {
+            return [String]()
+        }
         var result = [String]()
         let sourceLength = source.count
         
@@ -154,8 +194,9 @@ class GameScene: SKScene {
         for wordLength in 3...sourceLength {
             for startPos in 0...(sourceLength - wordLength) {
                 let startIndex = source.index(source.startIndex, offsetBy: startPos)
-                let endIndex = source.index(startIndex, offsetBy: wordLength+startPos)
-                let substr = source[startIndex..<endIndex]
+                let endIndex = source.index(startIndex, offsetBy: wordLength-1)
+                let substr = source[startIndex...endIndex]
+                
                 let substrToStr = String(substr).lowercased()
                 
                 if wordDict![substrToStr] != nil {
@@ -170,29 +211,7 @@ class GameScene: SKScene {
         return result
     }
 
-//    func findIndexesOfFirstEntryOfLetter(source: [String]) -> [String: Int] {
-//        var index = 0
-//        var dict = [String: Int]()
-//        for word in source {
-//            if let key = dict[String(word.first!)] {
-//
-//            } else {
-//                dict[String(word.first!)] = index
-//            }
-//            index += 1
-//        }
-//        print(dict)
-//        return dict
-//    }
     
-//    func nextLetter(letter: String) -> String? {
-//        if letter == "Z" {
-//            return nil
-//        }
-//        alphabetArray.index(of: letter) //?
-//    }
-    
-    // I think it needs to be reworked
     func getWordsArrayFromFile() throws -> [String] {
         
         if let path = Bundle.main.path(forResource: "ospd", ofType: "txt"){
@@ -338,7 +357,7 @@ extension GameScene {
         graph.remove(gkObstacles as [GKGraphNode])
         let path = graph.findPath(from: startNode!, to: endNode!) as! [GKGridGraphNode]
         var points = path.map { $0.gridPosition}
-        points.remove(at: 0) //mb possible to delete?
+        points.remove(at: 0)
         
         //move Letter using path and handle its state
         var moveActions = [SKAction]()
@@ -350,6 +369,8 @@ extension GameScene {
         Letter.activeNode?.run(SKAction.sequence(moveActions)) {
             self.gameIsBusy = false
         }
+        Thread.sleep(forTimeInterval: TimeInterval(0.5 * Double(points.count)))
+        //sleep(UInt32(Int32(0.5 * Double(points.count))))
         Letter.deactivateNode()
         
         //update moved Letter and add it to obstacles again
@@ -404,3 +425,7 @@ extension GameScene {
         return (Int32(col), Int32(row))
     }
 }
+
+
+
+
